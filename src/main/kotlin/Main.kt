@@ -1,3 +1,4 @@
+val startProgramm: LogicOfNavigation = LogicOfNavigation()
 fun main(args: Array<String>) {
-    println("Hello World!")
+    startProgramm.startMenu(startProgramm)
 }
