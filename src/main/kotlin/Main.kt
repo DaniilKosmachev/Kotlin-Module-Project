@@ -1,4 +1,7 @@
-val startProgramm: LogicOfNavigation = LogicOfNavigation()
+object Singlton {
+    val startProgramm: LogicOfNavigation = LogicOfNavigation()
+}
+
 fun main(args: Array<String>) {
-    startProgramm.startMenu(startProgramm)
+    Singlton.startProgramm.startMenu(Singlton.startProgramm)
 }

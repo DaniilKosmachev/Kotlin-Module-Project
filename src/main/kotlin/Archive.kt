@@ -1,27 +1,22 @@
-import java.util.*
-
 class Archive(val nameOfArchive: String) {
-    var mapOfNotes: MutableMap<Int, Notes> = HashMap()
+    var notes: MutableList<Notes> = mutableListOf()
     fun addNewNotes() {
-        var keysMax = 1//НАЧАЛО НУМЕРАЦИИ КЛЮЧЕЙ В MAP
         var userInputNameOfNote = ""//ПОЛЬЗОВАТЕЛЬСКИЙ ВВОД ИМЕНИ ЗАМЕТКИ
         var userInputTextOfNote = ""//ПОЛЬЗОВАТЕЛЬСКИЙ ВВОД ТЕКСТА ЗАМЕТКИ
         println("Введите имя для вашей заметки")
         while (true) {
             userInputNameOfNote = readln()//ЧИТАЕМ СТРОКУ
-            if (!userInputNameOfNote.equals("")) {
-                for (keys in mapOfNotes.keys) {//ПЕРЕБИРАЕМ ВСЕ ИМЕЮЩИЕСЯ КЛЮЧИ
-                    keysMax = keys//ПОЛУЧАЕМ КРАЙНИЙ ИЗ НИХ
-                }
-                ++keysMax//УВЕЛИЧИВАЕМ ЗНАЧЕНИЕ НА 1, ЧТОБЫ ПРИСВОИТЬ СЛЕДУЮЩИЙ ПОРЯДКОВЫЙ НОМЕР КЛЮЧУ
+            if (userInputNameOfNote != "") {
                 println("Введите текст заметки")
                 userInputTextOfNote = readln()//ЧИТАЕМ СТРОКУ
-                if (!userInputTextOfNote.equals("")) {
-                    mapOfNotes[keysMax] = Notes(
-                        userInputNameOfNote,
-                        userInputTextOfNote
-                    )//PUT ДЛЯ MAP ЗАМЕТОК, СО СЛЕДУЮЩИМ ПО ПОРЯДКУ КЛЮЧОМ
-                    startProgramm.startMenu(this)//ВОЗВРАЩАЕМСЯ К МЕНЮ ВЫБОРА АРХИВА
+                if (userInputTextOfNote != "") {
+                    notes.add(
+                        Notes(
+                            userInputNameOfNote,
+                            userInputTextOfNote
+                        )
+                    )
+                    Singlton.startProgramm.startMenu(this)//ВОЗВРАЩАЕМСЯ К МЕНЮ ВЫБОРА АРХИВА
                     break
                 } else {
                     println("Вы ничего не ввели. Попробуйте еще!")
@@ -35,13 +30,13 @@ class Archive(val nameOfArchive: String) {
     }
 
     fun showTextOfNote(numberOfNote: Int) {
-        if (mapOfNotes.contains(numberOfNote)) {
-            val currentNote =
-                mapOfNotes.get(numberOfNote)//ВЫБИРЕМ ПО КЛЮЧУ - ПЕРЕДАННОЙ ЦИФРЕ ИЗ checkArchivMenuPoint
-            println("===Выбрана заметка: ${currentNote!!.nameOfNote}===")//ПОЛУЧАЕМ ИМЯ ЗАМЕТКИ
+        try {
+            val currNote =
+                notes[numberOfNote - 2]//-2, тк помним про строку 19, где в выводе +2 из-за значений по-умолчанию
+            println("===Выбрана заметка: ${currNote.nameOfNote}===")//ПОЛУЧАЕМ ИМЯ ЗАМЕТКИ
             println("+++Текст заметки+++")
-            println("${currentNote.textOfNote}")//ПОЛУЧАЕМ ТЕКСТ ЗАМЕТКИ
-        } else {
+            println("${currNote.textOfNote}")
+        } catch (e: java.lang.IndexOutOfBoundsException) {
             println("Такого пункта меню или заметки не существует!")
         }
     }

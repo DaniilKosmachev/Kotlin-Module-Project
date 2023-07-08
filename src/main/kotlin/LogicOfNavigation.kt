@@ -1,10 +1,9 @@
 import java.util.*
 import kotlin.system.exitProcess
 
-//СДЕЛАТЬ РЕФАКТОРИНГ
 class LogicOfNavigation {
-    private var mapOfArchive: MutableMap<Int, Archive> =
-        HashMap()//КОЛЛЕКЦИЯ АРХИВОВ - MAP БЫЛ ВЫБРАН ПОТОМУ ЧТО УДОБНО НУМЕРОВАТЬ ПУНКТЫ МЕНЮ))
+    private var archives: MutableList<Archive> = mutableListOf()
+
 
     fun startMenu(objectOfInput: Any) {//СТАРТ ГЛАВНОГО МЕНЮ ПРОГРАММЫ
         if (objectOfInput is LogicOfNavigation) {
@@ -12,28 +11,22 @@ class LogicOfNavigation {
             println("===Главное меню===")
             println("0. Выход из программы")
             println("1. Создать архив")
-            if (mapOfArchive.isEmpty()) {//ПРОВЕРЯЕМ НА НЕПУСТОЙ MAP АРХИВОВ
+            if (archives.isEmpty()) {//ПРОВЕРЯЕМ НА НЕПУСТОЙ MAP АРХИВОВ
                 println("Вы не создали ни одного архива. Введите 1, чтобы это и справить! :)")
             } else {
-                for (key in mapOfArchive.keys) {
-                    val currArchive = mapOfArchive[key]
-                    println("${key}. ${currArchive!!.nameOfArchive}")
-                }
+                archives.forEachIndexed { key, value -> if (value != null) println("${key + 2}. ${value.nameOfArchive}") }//Вывод +2, тк 0 и 1 пункты заняты значением по-умолчанию
             }
             chechMenuPoint(this)//ЗАПУСКАЕМ ПРОВЕРКУ ВВОДА ПОЛЬЗОВАТЕЛЯ
         } else if (objectOfInput is Archive) {
             println("===Выбран архив: ${objectOfInput.nameOfArchive}===")
             println("0. Выход в главное меню")
             println("1. Создать заметку в архиве")
-            if (objectOfInput.mapOfNotes.isEmpty()) { //ПРОВЕРЯЕМ ПУСТОЙ ЛИ MAP У ЭТОГО ОБЪЕКТА
+            if (objectOfInput.notes.isEmpty()) { //ПРОВЕРЯЕМ ПУСТОЙ ЛИ MAP У ЭТОГО ОБЪЕКТА
                 println("Вы не создали ни одной заметки. Введите 1, чтобы это и справить! :)")
             } else { //ЕСЛИ НЕ ПУСТОЙ, ТО ВЫВОДИМ ОСТАЛЬНЫЕ ПУНКТЫ МЕНЮ - ИМЕЮЩИЕСЯ АРХИВЫ
-                for (key in objectOfInput.mapOfNotes.keys) {
-                    val currNote = objectOfInput.mapOfNotes[key]
-                    println("${key}. ${currNote!!.nameOfNote}")
-                }
+                objectOfInput.notes.forEachIndexed { index, notes -> if (notes != null) println("${index + 2}. ${notes.nameOfNote}") }//Вывод +2, тк 0 и 1 пункты заняты значением по-умолчанию
             }
-            startProgramm.chechMenuPoint(objectOfInput)
+            Singlton.startProgramm.chechMenuPoint(objectOfInput)
         }
     }
 
@@ -65,7 +58,7 @@ class LogicOfNavigation {
                 val command = Scanner(System.`in`).nextInt()
                 while (true) {
                     when (command) {
-                        0 -> startProgramm.startMenu(this) //ВОЗВРАЩАЕТ В МЕНЮ ВЫБОРА АРХИВОВ
+                        0 -> Singlton.startProgramm.startMenu(this)//ВОЗВРАЩАЕТ В МЕНЮ ВЫБОРА АРХИВОВ
                         1 -> {
                             objectOfInput.addNewNotes() //ДОБАВЛЯЕМ ЗАМЕТКУ К ТЕКУЩЕМУ ЭКЗЕМПЛЯРУ
                             return
@@ -84,18 +77,13 @@ class LogicOfNavigation {
         }
     }
 
-    private fun addNewArchive() {//МЕТОД ДОБАВЛЕНИЯ АРХИВА В MAP
-        var keysMax = 1//НАЧАЛО НУМЕРАЦИИ КЛЮЧА АРХИВОВ
+    private fun addNewArchive() {
         println("Введите имя для вашего архива")
         var userInputNameOfArchive = readln()
         while (true) {
-            if (!userInputNameOfArchive.equals("") && !userInputNameOfArchive.trim().equals("")
+            if ((userInputNameOfArchive != "") && (userInputNameOfArchive.trim() != "")
             ) {//ЕСЛИ НЕ ПУСТАЯ СТРОКА И ПОСЛЕ ТРИМА ОНА ТОЖЕ НЕ ПУСТА, ТО ОК
-                for (keys in mapOfArchive.keys) {
-                    keysMax = keys
-                }
-                ++keysMax
-                mapOfArchive[keysMax] = Archive(userInputNameOfArchive)
+                archives.add(Archive(userInputNameOfArchive))
                 return
             } else {
                 println("Вы ничего не ввели или ввели пробелы. Попробуйте еще!")
@@ -105,12 +93,11 @@ class LogicOfNavigation {
     }
 
     private fun changeOfArchiv(numberOfArchive: Int) {
-        if (mapOfArchive.containsKey(numberOfArchive)) {
-            val currArchive = mapOfArchive[numberOfArchive]
-            if (currArchive != null) {
-                startMenu(currArchive)
-            }
-        } else {
+        try {
+            val currArchive =
+                archives[numberOfArchive - 2]//-2, тк помним про строку 19, где в выводе +2 из-за значений по-умолчанию
+            startMenu(currArchive)
+        } catch (e: java.lang.IndexOutOfBoundsException) {
             println("Такого пункта меню или архива не существует!")
         }
     }
