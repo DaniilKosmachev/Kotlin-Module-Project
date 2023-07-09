@@ -1,3 +1,7 @@
+object Singlton {
+    val startProgramm: LogicOfNavigation = LogicOfNavigation()
+}
+
 fun main(args: Array<String>) {
-    println("Hello World!")
+    Singlton.startProgramm.startMenu(Singlton.startProgramm)
 }
